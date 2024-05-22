@@ -1,21 +1,21 @@
 package co.dfns.sdkandroid
 
 import android.app.Activity
-import androidx.credentials.CredentialManager
 import androidx.credentials.CreatePublicKeyCredentialRequest
 import androidx.credentials.CreatePublicKeyCredentialResponse
+import androidx.credentials.CredentialManager
 import androidx.credentials.GetCredentialRequest
 import androidx.credentials.GetPublicKeyCredentialOption
 import androidx.credentials.PublicKeyCredential
-import co.dfns.sdkandroid.model.CreatePasskeyRequest
 import co.dfns.sdkandroid.model.CreatePasskeyResponseData
 import co.dfns.sdkandroid.model.Fido2Assertion
-import co.dfns.sdkandroid.model.GetPasskeyResponseData
-import co.dfns.sdkandroid.model.UserRegistrationChallenge
 import co.dfns.sdkandroid.model.Fido2AssertionData
 import co.dfns.sdkandroid.model.Fido2Attestation
 import co.dfns.sdkandroid.model.Fido2AttestationData
 import co.dfns.sdkandroid.model.GetPasskeyRequest
+import co.dfns.sdkandroid.model.GetPasskeyResponseData
+import co.dfns.sdkandroid.model.UserActionChallenge
+import co.dfns.sdkandroid.model.UserRegistrationChallenge
 import com.google.gson.Gson
 
 class PasskeysSigner {
@@ -30,25 +30,9 @@ class PasskeysSigner {
             activity,
             CreatePublicKeyCredentialRequest(
                 gson.toJson(
-                    CreatePasskeyRequest(
-                        challenge = challenge.challenge,
-                        rp = CreatePasskeyRequest.Rp(
-                            name = challenge.rp.name, id = challenge.rp.id
-                        ),
-                        user = CreatePasskeyRequest.User(
-                            id = challenge.user.id.toByteArray().b64Encode(),
-                            name = challenge.user.name,
-                            displayName = challenge.user.displayName,
-                        ),
-                        pubKeyCredParams = challenge.pubKeyCredParams,
-                        timeout = 1800000,
-                        attestation = "none",
-                        excludeCredentials = emptyList(),
-                        authenticatorSelection = CreatePasskeyRequest.AuthenticatorSelection(
-                            authenticatorAttachment = "platform",
-                            requireResidentKey = false,
-                            residentKey = "required",
-                            userVerification = "required"
+                    challenge.copy(
+                        user = challenge.user.copy(
+                            id = challenge.user.id.toByteArray().b64Encode()
                         )
                     )
                 )
@@ -61,7 +45,7 @@ class PasskeysSigner {
         )
 
         val fido2AttestationData = Fido2AttestationData(
-            attestationData = responseData.response.attestationObject, // TODO: b64url?
+            attestationData = responseData.response.attestationObject,
             clientData = responseData.response.clientDataJSON,
             credId = responseData.rawId,
         )
@@ -73,16 +57,16 @@ class PasskeysSigner {
         return fido2Attestation
     }
 
-    suspend fun sign(activity: Activity, challenge: String, rpId: String): Fido2Assertion {
+    suspend fun sign(activity: Activity, challenge: UserActionChallenge): Fido2Assertion {
         val credentialManager = CredentialManager.create(activity)
 
         val option = GetPublicKeyCredentialOption(
             gson.toJson(
                 GetPasskeyRequest(
-                    challenge,
+                    challenge= challenge.challenge,
                     timeout = 1800000,
                     userVerification = "required",
-                    rpId = rpId,
+                    rpId = challenge.rp.id,
                     allowCredentials = listOf()
                 )
             )

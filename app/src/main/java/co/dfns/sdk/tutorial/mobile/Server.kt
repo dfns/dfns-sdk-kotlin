@@ -1,6 +1,6 @@
-package co.dfns.sdkandroid
+package co.dfns.sdk.tutorial.mobile
 
-import co.dfns.sdkandroid.Constants.BASE_URL
+import co.dfns.sdk.tutorial.mobile.Constants.BASE_URL
 import co.dfns.sdkandroid.model.Fido2Attestation
 import co.dfns.sdkandroid.model.UserActionAssertion
 import co.dfns.sdkandroid.model.UserActionChallenge

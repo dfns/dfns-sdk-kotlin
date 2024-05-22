@@ -1,4 +1,4 @@
-package co.dfns.sdk.tutorial.mobile
+package co.dfns.sdk.tutorial.mobile.ui
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column

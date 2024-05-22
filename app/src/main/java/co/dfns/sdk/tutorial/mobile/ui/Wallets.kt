@@ -1,4 +1,4 @@
-package co.dfns.sdk.tutorial.mobile
+package co.dfns.sdk.tutorial.mobile.ui
 
 import android.app.Activity
 import androidx.compose.foundation.background
@@ -28,10 +28,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import co.dfns.sdkandroid.Constants.APP_ID
+import co.dfns.sdk.tutorial.mobile.Constants.APP_ID
+import co.dfns.sdk.tutorial.mobile.Server
+import co.dfns.sdk.tutorial.mobile.Server.Wallet
 import co.dfns.sdkandroid.PasskeysSigner
-import co.dfns.sdkandroid.Server
-import co.dfns.sdkandroid.Server.Wallet
 import co.dfns.sdkandroid.model.UserActionAssertion
 import com.google.gson.GsonBuilder
 import kotlinx.coroutines.CoroutineScope
@@ -72,7 +72,7 @@ fun WalletsPage(
             )
 
             val fido2Assertion = signer.sign(
-                activity, initResponse.challenge.challenge, initResponse.challenge.rp.id
+                activity, initResponse.challenge
             )
 
             val userActionAssertion = UserActionAssertion(
