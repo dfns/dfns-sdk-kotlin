@@ -1,33 +1,40 @@
-package co.dfns.sdkandroid
+package co.dfns.androidsdk
 
-import android.app.Activity
+import android.content.Context
 import androidx.credentials.CreatePublicKeyCredentialRequest
 import androidx.credentials.CreatePublicKeyCredentialResponse
 import androidx.credentials.CredentialManager
 import androidx.credentials.GetCredentialRequest
 import androidx.credentials.GetPublicKeyCredentialOption
 import androidx.credentials.PublicKeyCredential
-import co.dfns.sdkandroid.model.CreatePasskeyResponseData
-import co.dfns.sdkandroid.model.Fido2Assertion
-import co.dfns.sdkandroid.model.Fido2AssertionData
-import co.dfns.sdkandroid.model.Fido2Attestation
-import co.dfns.sdkandroid.model.Fido2AttestationData
-import co.dfns.sdkandroid.model.GetPasskeyRequest
-import co.dfns.sdkandroid.model.GetPasskeyResponseData
-import co.dfns.sdkandroid.model.UserActionChallenge
-import co.dfns.sdkandroid.model.UserRegistrationChallenge
+import co.dfns.androidsdk.model.CreatePasskeyResponseData
+import co.dfns.androidsdk.model.Fido2Assertion
+import co.dfns.androidsdk.model.Fido2AssertionData
+import co.dfns.androidsdk.model.Fido2Attestation
+import co.dfns.androidsdk.model.Fido2AttestationData
+import co.dfns.androidsdk.model.GetPasskeyRequest
+import co.dfns.androidsdk.model.GetPasskeyResponseData
+import co.dfns.androidsdk.model.UserActionChallenge
+import co.dfns.androidsdk.model.UserRegistrationChallenge
 import com.google.gson.Gson
 
 class PasskeysSigner {
     private val gson = Gson()
+    private val context: Context
+    private val credentialManager: CredentialManager
+
+    constructor(context: Context) {
+        this.context = context
+        this.credentialManager = CredentialManager.create(context)
+    }
 
     suspend fun register(
-        activity: Activity, challenge: UserRegistrationChallenge
+        challenge: UserRegistrationChallenge
     ): Fido2Attestation {
-        val credentialManager = CredentialManager.create(activity)
+        val credentialManager = CredentialManager.create(context)
 
         val response = credentialManager.createCredential(
-            activity,
+            context,
             CreatePublicKeyCredentialRequest(
                 gson.toJson(
                     challenge.copy(
@@ -57,22 +64,22 @@ class PasskeysSigner {
         return fido2Attestation
     }
 
-    suspend fun sign(activity: Activity, challenge: UserActionChallenge): Fido2Assertion {
-        val credentialManager = CredentialManager.create(activity)
-
+    suspend fun sign(challenge: UserActionChallenge): Fido2Assertion {
+        val credentialManager = CredentialManager.create(context)
         val option = GetPublicKeyCredentialOption(
             gson.toJson(
                 GetPasskeyRequest(
-                    challenge= challenge.challenge,
-                    timeout = 1800000,
-                    userVerification = "required",
+                    challenge = challenge.challenge,
+                    allowCredentials = challenge.allowCredentials,
                     rpId = challenge.rp.id,
-                    allowCredentials = listOf()
-                )
+                    userVerification = challenge.userVerification,
+                    timeout = 1800000,
+
+                    )
             )
         )
         val getCredRequest = GetCredentialRequest(listOf(option))
-        val response = credentialManager.getCredential(activity, getCredRequest)
+        val response = credentialManager.getCredential(context, getCredRequest)
         val cred = response.credential as PublicKeyCredential
 
         val passkeyResponse =
@@ -93,4 +100,3 @@ class PasskeysSigner {
         return fido2Assertion
     }
 }
-

@@ -30,9 +30,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import co.dfns.androidsdk.PasskeysSigner
 import co.dfns.sdk.tutorial.mobile.Constants.APP_ID
 import co.dfns.sdk.tutorial.mobile.Server
-import co.dfns.sdkandroid.PasskeysSigner
 import co.dfns.sdk.tutorial.mobile.Server.Wallet
 import com.google.gson.GsonBuilder
 import kotlinx.coroutines.CoroutineScope
@@ -47,7 +47,7 @@ fun DelegatedRegistrationPage(
     wallet: MutableState<Wallet?> = mutableStateOf(null)
 ) {
     val gson = GsonBuilder().setPrettyPrinting().create()
-    val signer = PasskeysSigner()
+    val signer = PasskeysSigner(activity)
     val server = Server()
 
     val registrationResponse = remember { mutableStateOf("") }
@@ -56,7 +56,7 @@ fun DelegatedRegistrationPage(
         CoroutineScope(Dispatchers.IO).launch {
             val initResponse = server.registerInit(appId = APP_ID, username = username.value)
 
-            val fido2Attestation = signer.register(activity, challenge = initResponse)
+            val fido2Attestation = signer.register(challenge = initResponse)
 
             val completeResponse = server.registerComplete(
                 APP_ID,

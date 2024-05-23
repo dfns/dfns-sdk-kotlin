@@ -28,11 +28,11 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import co.dfns.androidsdk.PasskeysSigner
+import co.dfns.androidsdk.model.UserActionAssertion
 import co.dfns.sdk.tutorial.mobile.Constants.APP_ID
 import co.dfns.sdk.tutorial.mobile.Server
 import co.dfns.sdk.tutorial.mobile.Server.Wallet
-import co.dfns.sdkandroid.PasskeysSigner
-import co.dfns.sdkandroid.model.UserActionAssertion
 import com.google.gson.GsonBuilder
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -46,7 +46,7 @@ fun WalletsPage(
 ) {
     val gson = GsonBuilder().setPrettyPrinting().create()
     val server = Server()
-    val signer = PasskeysSigner()
+    val signer = PasskeysSigner(activity)
 
     val walletId = remember { mutableStateOf("listOf<Wallet>()") }
     val wallets = remember { mutableStateOf(listOf<Wallet>()) }
@@ -72,7 +72,7 @@ fun WalletsPage(
             )
 
             val fido2Assertion = signer.sign(
-                activity, initResponse.challenge
+                challenge = initResponse.challenge
             )
 
             val userActionAssertion = UserActionAssertion(

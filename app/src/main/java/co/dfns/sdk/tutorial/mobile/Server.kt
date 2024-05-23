@@ -1,10 +1,10 @@
 package co.dfns.sdk.tutorial.mobile
 
+import co.dfns.androidsdk.model.Fido2Attestation
+import co.dfns.androidsdk.model.UserActionAssertion
+import co.dfns.androidsdk.model.UserActionChallenge
+import co.dfns.androidsdk.model.UserRegistrationChallenge
 import co.dfns.sdk.tutorial.mobile.Constants.BASE_URL
-import co.dfns.sdkandroid.model.Fido2Attestation
-import co.dfns.sdkandroid.model.UserActionAssertion
-import co.dfns.sdkandroid.model.UserActionChallenge
-import co.dfns.sdkandroid.model.UserRegistrationChallenge
 import com.google.gson.Gson
 import java.io.BufferedReader
 import java.io.InputStreamReader
@@ -210,4 +210,3 @@ class Server {
         }
     }
 }
-

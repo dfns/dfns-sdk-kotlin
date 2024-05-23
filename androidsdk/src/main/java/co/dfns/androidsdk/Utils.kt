@@ -1,4 +1,4 @@
-package co.dfns.sdkandroid
+package co.dfns.androidsdk
 
 import android.util.Base64
 

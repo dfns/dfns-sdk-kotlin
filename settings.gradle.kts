@@ -21,4 +21,4 @@ dependencyResolutionManagement {
 
 rootProject.name = "Dfns Android SDK Example"
 include(":app")
-include(":sdkandroid")
+include(":androidsdk")

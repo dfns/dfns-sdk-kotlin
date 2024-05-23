@@ -32,7 +32,7 @@ class MainActivity : ComponentActivity() {
         val navController = rememberNavController()
 
         val username = remember { mutableStateOf("") }
-        val token = remember { mutableStateOf("" )}
+        val token = remember { mutableStateOf("") }
         NavHost(navController = navController, startDestination = "home") {
             composable("home") {
                 HomePage(
