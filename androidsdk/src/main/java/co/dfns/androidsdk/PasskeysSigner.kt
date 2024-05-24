@@ -31,15 +31,13 @@ class PasskeysSigner {
     suspend fun register(
         challenge: UserRegistrationChallenge
     ): Fido2Attestation {
-        val credentialManager = CredentialManager.create(context)
-
         val response = credentialManager.createCredential(
             context,
             CreatePublicKeyCredentialRequest(
                 gson.toJson(
                     challenge.copy(
                         user = challenge.user.copy(
-                            id = challenge.user.id.toByteArray().b64Encode()
+                            id = challenge.user.id.toByteArray().b64UrlEncode()
                         )
                     )
                 )
@@ -65,7 +63,6 @@ class PasskeysSigner {
     }
 
     suspend fun sign(challenge: UserActionChallenge): Fido2Assertion {
-        val credentialManager = CredentialManager.create(context)
         val option = GetPublicKeyCredentialOption(
             gson.toJson(
                 GetPasskeyRequest(
@@ -86,12 +83,11 @@ class PasskeysSigner {
             gson.fromJson(cred.authenticationResponseJson, GetPasskeyResponseData::class.java)
 
         val fido2AssertionData = Fido2AssertionData(
-            clientData = passkeyResponse.response.clientDataJSON.toByteArray().b64Encode(),
-            credId = passkeyResponse.rawId.toByteArray().b64Encode(),
-            signature = passkeyResponse.response.signature.toByteArray().b64Encode(),
-            authenticatorData = passkeyResponse.response.authenticatorData.toByteArray()
-                .b64Encode(),
-            userHandle = passkeyResponse.response.userHandle.toByteArray().b64Encode(),
+            clientData = passkeyResponse.response.clientDataJSON,
+            credId = passkeyResponse.rawId,
+            signature = passkeyResponse.response.signature,
+            authenticatorData = passkeyResponse.response.authenticatorData,
+            userHandle = passkeyResponse.response.userHandle,
         )
 
         val fido2Assertion = Fido2Assertion(
