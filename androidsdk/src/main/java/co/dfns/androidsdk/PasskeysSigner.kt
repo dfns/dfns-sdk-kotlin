@@ -67,12 +67,16 @@ class PasskeysSigner {
             gson.toJson(
                 GetPasskeyRequest(
                     challenge = challenge.challenge,
-                    allowCredentials = challenge.allowCredentials,
-                    rpId = challenge.rp.id,
-                    userVerification = challenge.userVerification,
+                    allowCredentials = challenge.allowCredentials.webauthn.map {
+                        GetPasskeyRequest.AllowCredentials(
+                            id = it.id,
+                            type = it.type,
+                        )
+                    },
                     timeout = 1800000,
-
-                    )
+                    userVerification = challenge.userVerification,
+                    rpId = challenge.rp.id,
+                )
             )
         )
         val getCredRequest = GetCredentialRequest(listOf(option))
