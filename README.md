@@ -71,7 +71,7 @@ the following information
 - Name, choose any name, for example `Dfns Tutorial Android`
 - Application Type, leave as the default `Default Application`
 - Relying Party, set to the domain you associated with the app, e.g. `panda-new-kit.ngrok-free.app`
-- Origin, set to the full url of the domain, e.g. `https://panda-new-kit.ngrok-free.app`
+- Origin, the Android format is android:apk-key-hash:<sha256_hash-of-apk-signing-cert>. For this tutorial app, the signing cert is fixed, the value is android:apk-key-hash:-sYXRdwJA3hvue3mKpYrOZ9zSPC7b4mbgzJmdZEDO5w. For your own application, follow [Android's guide](https://developer.android.com/training/sign-in/passkeys#verify-origin) to derive the correct origin.
 
 After the `Application` is created, copy and save the `App ID`,
 e.g. `ap-39abb-5nrrm-9k59k0u3jup3vivo`.
