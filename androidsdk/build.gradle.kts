@@ -4,7 +4,7 @@ plugins {
 }
 
 android {
-    namespace = "co.dfns.sdkandroid"
+    namespace = "co.dfns.androidsdk"
     compileSdk = 34
 
     defaultConfig {

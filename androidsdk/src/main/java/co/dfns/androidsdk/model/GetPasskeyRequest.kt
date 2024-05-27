@@ -1,4 +1,4 @@
-package co.dfns.sdkandroid.model
+package co.dfns.androidsdk.model
 
 data class GetPasskeyRequest(
     val challenge: String,
@@ -9,7 +9,6 @@ data class GetPasskeyRequest(
 ) {
     data class AllowCredentials(
         val id: String,
-        val transports: List<String>,
         val type: String,
     )
 }

@@ -1,8 +1,5 @@
-package co.dfns.sdk.tutorial.mobile
+package co.dfns.sdk.tutorial.mobile.ui
 
-import android.app.Activity
-import android.util.Log
-import androidx.activity.ComponentActivity
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -31,10 +28,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import co.dfns.sdkandroid.Constants.APP_ID
-import co.dfns.sdkandroid.PasskeysSigner
-import co.dfns.sdkandroid.Server
-import co.dfns.sdkandroid.Server.Wallet
+import co.dfns.sdk.tutorial.mobile.Server
 import com.google.gson.GsonBuilder
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -42,30 +36,21 @@ import kotlinx.coroutines.launch
 
 @Composable
 @Preview
-fun DelegatedRegistrationPage(
-    activity: Activity = ComponentActivity(),
-    username: MutableState<String> = mutableStateOf(""),
-    wallet: MutableState<Wallet?> = mutableStateOf(null)
+fun DelegatedLoginPage(
+    token: MutableState<String> = mutableStateOf(""),
+    username: MutableState<String> = mutableStateOf("")
 ) {
     val gson = GsonBuilder().setPrettyPrinting().create()
-    val signer = PasskeysSigner()
     val server = Server()
 
-    val registrationResponse = remember { mutableStateOf("") }
+    val loginResponse = remember { mutableStateOf("") }
 
-    fun register() {
+    fun login() {
         CoroutineScope(Dispatchers.IO).launch {
-            val initResponse = server.registerInit(appId = APP_ID, username = username.value)
+            val resp = server.login(username.value)
 
-            val fido2Attestation = signer.register(activity, challenge = initResponse)
-
-            val completeResponse = server.registerComplete(
-                APP_ID,
-                fido2Attestation,
-                temporaryAuthenticationToken = initResponse.temporaryAuthenticationToken
-            )
-
-            registrationResponse.value = gson.toJson(completeResponse)
+            loginResponse.value = gson.toJson(resp)
+            token.value = resp.token
         }
     }
 
@@ -76,24 +61,19 @@ fun DelegatedRegistrationPage(
             .verticalScroll(rememberScrollState()),
     ) {
         Text(
-            "Delegated Registration",
+            "Delegated Login",
             style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold),
             modifier = Modifier.padding(bottom = 16.dp),
         )
 
         Text(
-            "For this tutorial, you will register a Dfns EndUser, and this is where the registration flow starts. However, in your final app, the flow may be different and the username might come from your internal system.",
+            "For this tutorial, the delegated login flow is started on the client side by pressing the \"Login EndUser\" button. A request is sent to the server and a readonly auth token is returned in the response. This flow does not need users to sign with the WebAuthn credential.",
             modifier = Modifier.padding(bottom = 16.dp),
         )
 
         Text(
-            "After registration, the new end user will have an Ethereum testnet wallet and assigned the system permission, `DfnsDefaultEndUserAccess`, that grants the end user full access to their wallets.",
+            "This auth token is readonly and needs to be cached and passed along with all requests interacting with the Dfns API. To clearly demonstrate all the necessary components for each step, this example will cache the auth token in the application context and send it back with every sequently request to the server. You should however choose a more secure caching method.",
             modifier = Modifier.padding(bottom = 16.dp)
-        )
-
-        Text(
-            "Enter the email as the username you are registering, and hit the \"Register EndUser\" button.",
-            modifier = Modifier.padding(bottom = 16.dp),
         )
 
         OutlinedTextField(
@@ -116,13 +96,13 @@ fun DelegatedRegistrationPage(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(bottom = 18.dp),
-            onClick = { register() },
+            onClick = { login() },
             shape = RoundedCornerShape(50),
             colors = ButtonDefaults.buttonColors(
                 containerColor = MaterialTheme.colorScheme.primary
             )
         ) {
-            Text("Register User")
+            Text("Login EndUser")
         }
 
         Row(
@@ -131,7 +111,7 @@ fun DelegatedRegistrationPage(
                 .fillMaxWidth()
         ) {
             Text(
-                text = registrationResponse.value,
+                text = loginResponse.value,
                 modifier = Modifier.padding(all = 16.dp),
                 color = Color.White
             )

@@ -1,8 +1,8 @@
-package co.dfns.sdkandroid.model
+package co.dfns.androidsdk.model
 
 import com.google.gson.annotations.SerializedName
 
-data class GetPasskeyResponseData(
+data class CreatePasskeyResponseData(
     @SerializedName("response") val response: Response,
     @SerializedName("authenticatorAttachment") val authenticatorAttachment: String,
     @SerializedName("id") val id: String,
@@ -11,8 +11,7 @@ data class GetPasskeyResponseData(
 ) {
     data class Response(
         @SerializedName("clientDataJSON") val clientDataJSON: String,
-        @SerializedName("authenticatorData") val authenticatorData: String,
-        @SerializedName("signature") val signature: String,
-        @SerializedName("userHandle") val userHandle: String
+        @SerializedName("attestationObject") val attestationObject: String,
+        @SerializedName("transports") val transports: List<String>
     )
 }

@@ -1,4 +1,4 @@
-package co.dfns.sdkandroid.model
+package co.dfns.androidsdk.model
 
 data class RelyingParty(
     val id: String, val name: String
