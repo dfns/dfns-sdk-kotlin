@@ -27,7 +27,6 @@ data class PublicKeyCredentialParameters(
 data class PublicKeyCredentialDescriptor(
     val type: String,
     val id: String,
-    val transports: String?,
 )
 
 data class UserRegistrationChallenge(
