@@ -27,10 +27,7 @@ data class PublicKeyCredentialParameters(
 data class PublicKeyCredentialDescriptor(
     val type: String,
     val id: String,
-)
-
-data class ExcludeCredentials(
-    val type: String, val id: String, val transports: String?,
+    val transports: String?,
 )
 
 data class UserRegistrationChallenge(
@@ -43,7 +40,7 @@ data class UserRegistrationChallenge(
     val authenticatorSelection: AuthenticatorSelectionCriteria,
     val attestation: String,
     val pubKeyCredParams: List<PublicKeyCredentialParameters>,
-    val excludeCredentials: List<ExcludeCredentials>
+    val excludeCredentials: List<PublicKeyCredentialDescriptor>
 )
 
 data class Fido2AttestationData(
