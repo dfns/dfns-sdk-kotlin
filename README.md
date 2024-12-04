@@ -89,3 +89,12 @@ In the `./app/src/main/java/co/dfns/sdk/tutorial/mobile/Constants.kt` set the fo
 - `appId` = the `App ID` of the new `Application`
 - `url` = either `http://localhost:8000` or if using ngrok, the public
   url `https://panda-new-kit.ngrok-free.app`
+
+
+# Publishing
+Uses [tddworks/central-portal-publisher](https://github.com/tddworks/central-portal-publisher) and requires signing + env var export for maven central auth tokens
+```
+## Provide Sonatype Portal credentials
+SONATYPE_USERNAME=[your-sonatype-username]
+SONATYPE_PASSWORD=[your-sonatype-password]
+```
