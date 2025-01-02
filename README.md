@@ -29,14 +29,11 @@ registered with the User.
 
 This request signature serves as cryptographic proof that only authorized entities are making the
 request. Without it, the request would result in an Unauthorized error.
-While implementing an Android application your backend server will have to communicate with the DFNS
-API
-to retrieve this challenge and pass it to your application, `PasskeysSigner` will be used to
-register
-and authenticate a user.
+
+While implementing an Android application your backend server will have to communicate with the DFNS API to retrieve this challenge and pass it to your application, `PasskeysSigner` will be used to register and authenticate a user.
 
 ```
-val passkeysSigner = PasskeysSigner(context)
+val passkeysSigner = PasskeysSigner(context, RelyingParty(id, name))
 ```
 
 #### Register
@@ -53,39 +50,14 @@ val fido2Assertion = passkeysSigner.sign(challenge)
 
 ## DfnsDemo
 
-A demo application using the SDK can be
-found [here](https://github.com/dfns/dfns-sdk-kotlin/tree/main/app). This demo application is to be
-used in conjunction with
-the [delegated registration and login tutorial](https://github.com/dfns/dfns-sdk-ts/tree/m/examples/sdk/auth-delegated#mobile-frontend).
-It is a replacement for the `Android` section, you should read and execute all instruction written
-above
-this section to get this demo running.
-
-#### Prerequisites
-
-To run the demo application on an Android device, you must have an `Application` for Android. To
-create
-a
-new `Application`, go
-to `Dfns Dashboard` > `Settings` > `Org Settings` > `Applications` > `New Application`, and enter
-the following information
-
-- Name, choose any name, for example `Dfns Tutorial Android`
-- Application Type, leave as the default `Default Application`
-- Relying Party, set to the domain you associated with the app, e.g. `panda-new-kit.ngrok-free.app`
-- Origin, the Android format is android:apk-key-hash:<sha256_hash-of-apk-signing-cert>. For this
-  tutorial app, the signing cert is fixed, the value is android:apk-key-hash:
-  -sYXRdwJA3hvue3mKpYrOZ9zSPC7b4mbgzJmdZEDO5w. For your own application,
-  follow [Android's guide](https://developer.android.com/training/sign-in/passkeys#verify-origin) to
-  derive the correct origin.
-
-After the `Application` is created, copy and save the `App ID`,
-e.g. `ap-39abb-5nrrm-9k59k0u3jup3vivo`.
+A demo application using the SDK can be found [here](https://github.com/dfns/dfns-sdk-kotlin/tree/main/app). This demo application is to be used in conjunction with the server in [delegated registration and login tutorial](https://github.com/dfns/dfns-sdk-ts/tree/m/examples/sdk/auth-delegated#mobile-frontend). It is a replacement for the `Android` section over there, you should read and execute all instruction written above this section to get this demo running.
 
 #### Configuration
 
 In the `./app/src/main/java/co/dfns/sdk/tutorial/mobile/Constants.kt` set the following values,
 
-- `appId` = the `App ID` of the new `Application`
-- `url` = either `http://localhost:8000` or if using ngrok, the public
-  url `https://panda-new-kit.ngrok-free.app`
+* `DFNS_APP_ID`: Dfns Application ID (grab one in Dfns Dashboard: `Settings` > `Applications`)
+* `SERVER_BASE_URL`: base url of the server you launched (eg `http://localhost:8000`, or if using ngrok, the public ngrok url)
+* `PASSKEY_RELYING_PARTY_ID`: the passkey relying party id, aka, the domain on which the above server is served ((Read more [here](https://developer.mozilla.org/en-US/docs/Web/API/PublicKeyCredentialCreationOptions#rp))). If serving the server on `http://localhost:8000`, then set it to `localhost`. If serving the server through ngrok (eg `https://d0d7-31-217-63-194.ngrok-free.app`), then set it to `ngrok-free.app`. In general, we advise you use the root domain (eg. `acme.com`, not `app.acme.com`) for more passkey flexibility (so that passkey is re-usable on subdomains).
+* `PASSKEY_RELYING_PARTY_NAME`: A string representing the name of the relying party, aka, your company name (e.g. "Acme"). The user will be presented with that name when creating or using a passkey.
+
