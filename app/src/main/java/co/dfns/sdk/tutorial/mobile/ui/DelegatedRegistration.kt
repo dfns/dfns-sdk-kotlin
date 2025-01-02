@@ -31,7 +31,10 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import co.dfns.androidsdk.PasskeysSigner
-import co.dfns.sdk.tutorial.mobile.Constants.APP_ID
+import co.dfns.androidsdk.model.RelyingParty
+import co.dfns.sdk.tutorial.mobile.Constants.DFNS_APP_ID
+import co.dfns.sdk.tutorial.mobile.Constants.PASSKEY_RELYING_PARTY_ID
+import co.dfns.sdk.tutorial.mobile.Constants.PASSKEY_RELYING_PARTY_NAME
 import co.dfns.sdk.tutorial.mobile.Server
 import co.dfns.sdk.tutorial.mobile.Server.Wallet
 import com.google.gson.GsonBuilder
@@ -47,19 +50,20 @@ fun DelegatedRegistrationPage(
     wallet: MutableState<Wallet?> = mutableStateOf(null)
 ) {
     val gson = GsonBuilder().setPrettyPrinting().create()
-    val signer = PasskeysSigner(activity)
+    val relyingParty = RelyingParty(id = PASSKEY_RELYING_PARTY_ID, name = PASSKEY_RELYING_PARTY_NAME)
+    val signer = PasskeysSigner(activity, relyingParty)
     val server = Server()
 
     val registrationResponse = remember { mutableStateOf("") }
 
     fun register() {
         CoroutineScope(Dispatchers.IO).launch {
-            val initResponse = server.registerInit(appId = APP_ID, username = username.value)
+            val initResponse = server.registerInit(appId = DFNS_APP_ID, username = username.value)
 
             val fido2Attestation = signer.register(challenge = initResponse)
 
             val completeResponse = server.registerComplete(
-                APP_ID,
+                DFNS_APP_ID,
                 fido2Attestation,
                 temporaryAuthenticationToken = initResponse.temporaryAuthenticationToken
             )

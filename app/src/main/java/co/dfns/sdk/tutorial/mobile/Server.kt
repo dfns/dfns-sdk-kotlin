@@ -4,7 +4,7 @@ import co.dfns.androidsdk.model.Fido2Attestation
 import co.dfns.androidsdk.model.UserActionAssertion
 import co.dfns.androidsdk.model.UserActionChallenge
 import co.dfns.androidsdk.model.UserRegistrationChallenge
-import co.dfns.sdk.tutorial.mobile.Constants.BASE_URL
+import co.dfns.sdk.tutorial.mobile.Constants.SERVER_BASE_URL
 import com.google.gson.Gson
 import java.io.BufferedReader
 import java.io.InputStreamReader
@@ -186,7 +186,7 @@ class Server {
     private inline fun <reified T> makeRequest(
         path: String, postBody: String
     ): T {
-        val connection = URL("${BASE_URL}${path}").openConnection() as HttpURLConnection
+        val connection = URL("${SERVER_BASE_URL}${path}").openConnection() as HttpURLConnection
         connection.setRequestMethod("POST")
         connection.setRequestProperty("Content-Type", "application/json")
         connection.setRequestProperty("Accept", "application/json")

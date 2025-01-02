@@ -30,7 +30,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import co.dfns.androidsdk.PasskeysSigner
 import co.dfns.androidsdk.model.UserActionAssertion
-import co.dfns.sdk.tutorial.mobile.Constants.APP_ID
+import co.dfns.sdk.tutorial.mobile.Constants.DFNS_APP_ID
+import co.dfns.sdk.tutorial.mobile.Constants.PASSKEY_RELYING_PARTY_ID
+import co.dfns.sdk.tutorial.mobile.Constants.PASSKEY_RELYING_PARTY_NAME
 import co.dfns.sdk.tutorial.mobile.Server
 import co.dfns.sdk.tutorial.mobile.Server.Wallet
 import com.google.gson.GsonBuilder
@@ -46,7 +48,8 @@ fun WalletsPage(
 ) {
     val gson = GsonBuilder().setPrettyPrinting().create()
     val server = Server()
-    val signer = PasskeysSigner(activity)
+    val relyingParty = RelyingParty(id = PASSKEY_RELYING_PARTY_ID, name = PASSKEY_RELYING_PARTY_NAME)
+    val signer = PasskeysSigner(activity, relyingParty)
 
     val walletId = remember { mutableStateOf("listOf<Wallet>()") }
     val wallets = remember { mutableStateOf(listOf<Wallet>()) }
@@ -55,7 +58,7 @@ fun WalletsPage(
 
     LaunchedEffect(Unit) {
         CoroutineScope(Dispatchers.IO).launch {
-            val resp = server.listWallets(APP_ID, token.value)
+            val resp = server.listWallets(DFNS_APP_ID, token.value)
 
             walletId.value = resp.items[0].id
             wallets.value = resp.items
@@ -67,7 +70,7 @@ fun WalletsPage(
             val initResponse = server.initSignature(
                 message = message.value,
                 walletId = walletId.value,
-                appId = APP_ID,
+                appId = DFNS_APP_ID,
                 authToken = token.value
             )
 
@@ -81,7 +84,7 @@ fun WalletsPage(
             )
             val completeResponse = server.completeSignature(
                 walletId = walletId.value,
-                appId = APP_ID,
+                appId = DFNS_APP_ID,
                 authToken = token.value,
                 requestBody = initResponse.requestBody,
                 signedChallenge = userActionAssertion

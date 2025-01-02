@@ -16,15 +16,18 @@ import co.dfns.androidsdk.model.GetPasskeyRequest
 import co.dfns.androidsdk.model.GetPasskeyResponseData
 import co.dfns.androidsdk.model.UserActionChallenge
 import co.dfns.androidsdk.model.UserRegistrationChallenge
+import co.dfns.androidsdk.model.RelyingParty
 import com.google.gson.Gson
 
 class PasskeysSigner {
     private val gson = Gson()
     private val context: Context
     private val credentialManager: CredentialManager
+    private val relyingParty: RelyingParty
 
-    constructor(context: Context) {
+    constructor(context: Context, relyingParty: RelyingParty) {
         this.context = context
+        this.relyingParty = relyingParty
         this.credentialManager = CredentialManager.create(context)
     }
 
@@ -39,6 +42,7 @@ class PasskeysSigner {
                         user = challenge.user.copy(
                             id = challenge.user.id.toByteArray().b64UrlEncode()
                         )
+                        rp = relyingParty
                     )
                 )
             ),
@@ -75,7 +79,7 @@ class PasskeysSigner {
                     },
                     timeout = 1800000,
                     userVerification = challenge.userVerification,
-                    rpId = challenge.rp.id,
+                    rpId = relyingParty.id,
                 )
             )
         )
