@@ -56,7 +56,6 @@ A demo application using the SDK can be found [here](https://github.com/dfns/dfn
 
 In the `./app/src/main/java/co/dfns/sdk/tutorial/mobile/Constants.kt` set the following values,
 
-* `DFNS_APP_ID`: Dfns Application ID (grab one in Dfns Dashboard: `Settings` > `Applications`)
 * `SERVER_BASE_URL`: base url of the server you launched (eg `http://localhost:8000`, or if using ngrok, the public ngrok url)
 * `PASSKEY_RELYING_PARTY_ID`: the passkey relying party id, aka, the domain on which the above server is served ((Read more [here](https://developer.mozilla.org/en-US/docs/Web/API/PublicKeyCredentialCreationOptions#rp))). If serving the server on `http://localhost:8000`, then set it to `localhost`. If serving the server through ngrok (eg `https://d0d7-31-217-63-194.ngrok-free.app`), then set it to `ngrok-free.app`. In general, we advise you use the root domain (eg. `acme.com`, not `app.acme.com`) for more passkey flexibility (so that passkey is re-usable on subdomains).
 * `PASSKEY_RELYING_PARTY_NAME`: A string representing the name of the relying party, aka, your company name (e.g. "Acme"). The user will be presented with that name when creating or using a passkey.

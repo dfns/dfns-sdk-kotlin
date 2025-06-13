@@ -32,7 +32,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import co.dfns.androidsdk.PasskeysSigner
 import co.dfns.androidsdk.model.RelyingParty
-import co.dfns.sdk.tutorial.mobile.Constants.DFNS_APP_ID
 import co.dfns.sdk.tutorial.mobile.Constants.PASSKEY_RELYING_PARTY_ID
 import co.dfns.sdk.tutorial.mobile.Constants.PASSKEY_RELYING_PARTY_NAME
 import co.dfns.sdk.tutorial.mobile.Server
@@ -58,12 +57,11 @@ fun DelegatedRegistrationPage(
 
     fun register() {
         CoroutineScope(Dispatchers.IO).launch {
-            val initResponse = server.registerInit(appId = DFNS_APP_ID, username = username.value)
+            val initResponse = server.registerInit(username = username.value)
 
             val fido2Attestation = signer.register(challenge = initResponse)
 
             val completeResponse = server.registerComplete(
-                DFNS_APP_ID,
                 fido2Attestation,
                 temporaryAuthenticationToken = initResponse.temporaryAuthenticationToken
             )

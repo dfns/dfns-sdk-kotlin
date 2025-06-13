@@ -15,15 +15,14 @@ class Server {
     private val gson = Gson()
 
     fun registerInit(
-        appId: String, username: String
+        username: String
     ): UserRegistrationChallenge {
         data class RegisterInit(
-            val appId: String,
             val username: String,
         )
 
         val path = "/register/init"
-        val postBody = gson.toJson(RegisterInit(appId, username))
+        val postBody = gson.toJson(RegisterInit(username))
 
         return makeRequest<UserRegistrationChallenge>(path, postBody)
     }
@@ -37,14 +36,13 @@ class Server {
     )
 
     fun registerComplete(
-        appId: String, fido2Attestation: Fido2Attestation, temporaryAuthenticationToken: String
+        fido2Attestation: Fido2Attestation, temporaryAuthenticationToken: String
     ): RegistrationCompletionResponse {
         data class SignedChallenge(
             val firstFactorCredential: Fido2Attestation,
         )
 
         data class RegisterComplete(
-            val appId: String,
             val signedChallenge: SignedChallenge,
             val temporaryAuthenticationToken: String,
         )
@@ -52,7 +50,6 @@ class Server {
         val path = "/register/complete"
         val postBody = gson.toJson(
             RegisterComplete(
-                appId,
                 SignedChallenge(firstFactorCredential = fido2Attestation),
                 temporaryAuthenticationToken
             )
@@ -85,17 +82,16 @@ class Server {
     )
 
     fun listWallets(
-        appId: String, authToken: String
+        authToken: String
     ): ListWalletsResponse {
         data class ListWalletsRequest(
-            val appId: String,
             val authToken: String,
         )
 
         val path = "/wallets/list"
         val postBody = gson.toJson(
             ListWalletsRequest(
-                appId, authToken
+                authToken
             )
         )
 
@@ -114,20 +110,18 @@ class Server {
     fun initSignature(
         message: String,
         walletId: String,
-        appId: String,
         authToken: String,
     ): InitSignatureResponse {
         data class InitSignatureRequest(
             val message: String,
             val walletId: String,
-            val appId: String,
             val authToken: String,
         )
 
         val path = "/wallets/signatures/init"
         val postBody = gson.toJson(
             InitSignatureRequest(
-                message, walletId, appId, authToken
+                message, walletId, authToken
             )
         )
 
@@ -136,7 +130,6 @@ class Server {
 
     data class Requester(
         val userId: String,
-        val appId: String,
     )
 
     data class Signature(
@@ -160,14 +153,12 @@ class Server {
 
     fun completeSignature(
         walletId: String,
-        appId: String,
         authToken: String,
         requestBody: InitSignatureRequestBody,
         signedChallenge: UserActionAssertion,
     ): CompleteSignatureResponse {
         data class CompleteSignatureRequest(
             val walletId: String,
-            val appId: String,
             val authToken: String,
             val requestBody: InitSignatureRequestBody,
             val signedChallenge: UserActionAssertion,
@@ -176,7 +167,7 @@ class Server {
         val path = "/wallets/signatures/complete"
         val postBody = gson.toJson(
             CompleteSignatureRequest(
-                walletId, appId, authToken, requestBody, signedChallenge
+                walletId, authToken, requestBody, signedChallenge
             )
         )
 

@@ -30,7 +30,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import co.dfns.androidsdk.PasskeysSigner
 import co.dfns.androidsdk.model.UserActionAssertion
-import co.dfns.sdk.tutorial.mobile.Constants.DFNS_APP_ID
 import co.dfns.sdk.tutorial.mobile.Constants.PASSKEY_RELYING_PARTY_ID
 import co.dfns.sdk.tutorial.mobile.Constants.PASSKEY_RELYING_PARTY_NAME
 import co.dfns.sdk.tutorial.mobile.Server
@@ -58,7 +57,7 @@ fun WalletsPage(
 
     LaunchedEffect(Unit) {
         CoroutineScope(Dispatchers.IO).launch {
-            val resp = server.listWallets(DFNS_APP_ID, token.value)
+            val resp = server.listWallets(token.value)
 
             walletId.value = resp.items[0].id
             wallets.value = resp.items
@@ -70,7 +69,6 @@ fun WalletsPage(
             val initResponse = server.initSignature(
                 message = message.value,
                 walletId = walletId.value,
-                appId = DFNS_APP_ID,
                 authToken = token.value
             )
 
@@ -84,7 +82,6 @@ fun WalletsPage(
             )
             val completeResponse = server.completeSignature(
                 walletId = walletId.value,
-                appId = DFNS_APP_ID,
                 authToken = token.value,
                 requestBody = initResponse.requestBody,
                 signedChallenge = userActionAssertion
