@@ -41,7 +41,7 @@ class PasskeysSigner {
                     challenge.copy(
                         user = challenge.user.copy(
                             id = challenge.user.id.toByteArray().b64UrlEncode()
-                        )
+                        ),
                         rp = relyingParty
                     )
                 )

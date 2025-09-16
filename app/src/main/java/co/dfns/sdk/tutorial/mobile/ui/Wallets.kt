@@ -29,6 +29,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import co.dfns.androidsdk.PasskeysSigner
+import co.dfns.androidsdk.model.RelyingParty
 import co.dfns.androidsdk.model.UserActionAssertion
 import co.dfns.sdk.tutorial.mobile.Constants.PASSKEY_RELYING_PARTY_ID
 import co.dfns.sdk.tutorial.mobile.Constants.PASSKEY_RELYING_PARTY_NAME
@@ -47,7 +48,8 @@ fun WalletsPage(
 ) {
     val gson = GsonBuilder().setPrettyPrinting().create()
     val server = Server()
-    val relyingParty = RelyingParty(id = PASSKEY_RELYING_PARTY_ID, name = PASSKEY_RELYING_PARTY_NAME)
+    val relyingParty =
+        RelyingParty(id = PASSKEY_RELYING_PARTY_ID, name = PASSKEY_RELYING_PARTY_NAME)
     val signer = PasskeysSigner(activity, relyingParty)
 
     val walletId = remember { mutableStateOf("listOf<Wallet>()") }

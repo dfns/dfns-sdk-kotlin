@@ -31,7 +31,7 @@ data class PublicKeyCredentialDescriptor(
 
 data class UserRegistrationChallenge(
     val temporaryAuthenticationToken: String,
-    val rp: RelyingParty? = null
+    val rp: RelyingParty? = null,
     val user: UserInformation,
     val supportedCredentialKinds: SupportedCredentialKinds,
     val otpUrl: String,
@@ -63,7 +63,7 @@ data class UserActionChallenge(
     val externalAuthenticationUrl: String,
     val challenge: String,
     val challengeIdentifier: String,
-    val rp: RelyingParty? = null
+    val rp: RelyingParty? = null,
     val supportedCredentialKinds: List<SupportedCredentialKinds>,
     val allowCredentials: AllowCredentials
 )
