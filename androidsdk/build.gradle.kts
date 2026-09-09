@@ -29,6 +29,12 @@ android {
     kotlinOptions {
         jvmTarget = "1.8"
     }
+    testOptions {
+        unitTests {
+            isIncludeAndroidResources = true
+            isReturnDefaultValues = true
+        }
+    }
 }
 
 dependencies {
@@ -36,12 +42,13 @@ dependencies {
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
 
-    implementation("com.google.code.gson:gson:2.11.0")
+    implementation(libs.gson)
 
     implementation("androidx.credentials:credentials:1.2.2")
 //    implementation("androidx.credentials:credentials-play-services-auth:1.2.2")
 
     testImplementation(libs.junit)
+    testImplementation(libs.robolectric)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
 }
