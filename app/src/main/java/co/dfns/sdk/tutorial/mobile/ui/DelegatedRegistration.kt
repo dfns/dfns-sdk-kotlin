@@ -59,7 +59,7 @@ fun DelegatedRegistrationPage(
         CoroutineScope(Dispatchers.IO).launch {
             val initResponse = server.registerInit(username = username.value)
 
-            val fido2Attestation = signer.register(challenge = initResponse)
+            val fido2Attestation = signer.create(challenge = initResponse)
 
             val completeResponse = server.registerComplete(
                 fido2Attestation,

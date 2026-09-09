@@ -39,7 +39,7 @@ val passkeysSigner = PasskeysSigner(context, RelyingParty(id, name))
 #### Register
 
 ```
-val fido2Attestation = passkeysSigner.register(challenge)
+val fido2Attestation = passkeysSigner.create(challenge)
 ```
 
 #### Sign
