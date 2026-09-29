@@ -24,14 +24,27 @@ class PasskeysSigner {
     private val context: Context
     private val credentialManager: CredentialManager
     private val relyingParty: RelyingParty
+    private val timeout: Long
 
-    constructor(context: Context, relyingParty: RelyingParty) {
+    companion object {
+        const val DEFAULT_WAIT_TIMEOUT = 60_000L
+    }
+
+    constructor(
+        context: Context,
+        relyingParty: RelyingParty,
+        timeout: Long = DEFAULT_WAIT_TIMEOUT
+    ) {
+        require(relyingParty.id.isNotBlank() && relyingParty.name.isNotBlank()) {
+            "Relying party ID and name must be specified"
+        }
         this.context = context
         this.relyingParty = relyingParty
+        this.timeout = timeout
         this.credentialManager = CredentialManager.create(context)
     }
 
-    suspend fun register(
+    suspend fun create(
         challenge: UserRegistrationChallenge
     ): Fido2Attestation {
         val response = credentialManager.createCredential(
@@ -77,7 +90,7 @@ class PasskeysSigner {
                             type = it.type,
                         )
                     },
-                    timeout = 1800000,
+                    timeout = timeout,
                     userVerification = challenge.userVerification,
                     rpId = relyingParty.id,
                 )

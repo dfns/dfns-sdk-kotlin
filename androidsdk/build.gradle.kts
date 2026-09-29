@@ -29,6 +29,12 @@ android {
     kotlinOptions {
         jvmTarget = "1.8"
     }
+    testOptions {
+        unitTests {
+            // Safety net if a unit test ever touches an Android stub; the current tests are pure JVM.
+            isReturnDefaultValues = true
+        }
+    }
 }
 
 dependencies {
@@ -36,7 +42,7 @@ dependencies {
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
 
-    implementation("com.google.code.gson:gson:2.11.0")
+    implementation(libs.gson)
 
     implementation("androidx.credentials:credentials:1.2.2")
 //    implementation("androidx.credentials:credentials-play-services-auth:1.2.2")
