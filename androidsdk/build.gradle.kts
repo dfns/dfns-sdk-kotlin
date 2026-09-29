@@ -31,7 +31,7 @@ android {
     }
     testOptions {
         unitTests {
-            isIncludeAndroidResources = true
+            // Safety net if a unit test ever touches an Android stub; the current tests are pure JVM.
             isReturnDefaultValues = true
         }
     }
@@ -48,15 +48,6 @@ dependencies {
 //    implementation("androidx.credentials:credentials-play-services-auth:1.2.2")
 
     testImplementation(libs.junit)
-    testImplementation(libs.robolectric)
-    // Force a patched Bouncy Castle on the (test-only) Robolectric classpath: Robolectric 4.16.1
-    // pulls bcprov-jdk18on:1.81, which is affected by CVE-2026-58062 (critical) and
-    // GHSA-qp49-qgx5-5m26 (high). It never ships in the SDK, but keep the CI dependency graph clean.
-    constraints {
-        testImplementation(libs.bouncycastle.bcprov) {
-            because("bcprov-jdk18on < 1.82 has CVE-2026-58062 / GHSA-qp49-qgx5-5m26")
-        }
-    }
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
 }

@@ -3,16 +3,13 @@ package co.dfns.androidsdk
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Test
-import org.junit.runner.RunWith
-import org.robolectric.RobolectricTestRunner
 
 /**
  * Unit tests for [ByteArray.b64UrlEncode].
  *
- * The extension relies on [android.util.Base64], so the tests run under
- * [RobolectricTestRunner] to have the Android framework classes resolve on the JVM.
+ * The extension uses [java.util.Base64], so these run as plain JVM unit tests —
+ * no Android framework (and therefore no Robolectric) required.
  */
-@RunWith(RobolectricTestRunner::class)
 class UtilsTest {
 
     @Test
