@@ -12,6 +12,13 @@ Welcome, builders 👋🔑 This repo holds Dfns Android SDK. Useful links:
 This means that while we've worked hard to ensure its functionality there may still be bugs,
 performance issues, or unexpected behavior.
 
+## Requirements
+
+- **Android 9 (API level 28) or higher.** The SDK is built with `minSdk = 28`, so consuming apps must declare `minSdk` 28 or above. This floor matches passkey support on Android, which is available from Android 9 onwards.
+- **Credential Manager provider.** Passkeys are created and asserted through [Credential Manager](https://developer.android.com/identity/sign-in/credential-manager) (`androidx.credentials`). On Android 13 and below, Credential Manager is backed by Google Play services: the device must have Google Play services, and your app must include the `androidx.credentials:credentials-play-services-auth` dependency alongside the SDK. On Android 14+, the framework supports third-party credential providers as well.
+- **Screen lock configured.** The device must have a screen lock (PIN, pattern, or biometric) set up; passkey creation fails without one.
+- **A credential provider account.** By default passkeys are saved to Google Password Manager, which requires a signed-in Google account (or, on Android 14+, another credential provider chosen by the user).
+
 ## Installation
 
 TBC
