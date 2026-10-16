@@ -3,6 +3,9 @@ plugins {
     alias(libs.plugins.jetbrains.kotlin.android)
 }
 
+group = "co.dfns"
+version = "1.0.0"
+
 android {
     namespace = "co.dfns.androidsdk"
     compileSdk = 34
@@ -38,14 +41,8 @@ android {
 }
 
 dependencies {
-    implementation(libs.androidx.core.ktx)
-    implementation(libs.androidx.appcompat)
-    implementation(libs.material)
-
+    implementation(libs.androidx.credentials)
     implementation(libs.gson)
-
-    implementation("androidx.credentials:credentials:1.2.2")
-//    implementation("androidx.credentials:credentials-play-services-auth:1.2.2")
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

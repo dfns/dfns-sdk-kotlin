@@ -5,13 +5,6 @@ Welcome, builders 👋🔑 This repo holds Dfns Android SDK. Useful links:
 - [Dfns Website](https://www.dfns.co)
 - [Dfns API Docs](https://docs.dfns.co)
 
-## BETA Warning
-
-:warning: **Attention: This project is currently in BETA.**
-
-This means that while we've worked hard to ensure its functionality there may still be bugs,
-performance issues, or unexpected behavior.
-
 ## Requirements
 
 - **Android 9 (API level 28) or higher.** The SDK is built with `minSdk = 28`, so consuming apps must declare `minSdk` 28 or above. This floor matches passkey support on Android, which is available from Android 9 onwards.
@@ -21,7 +14,43 @@ performance issues, or unexpected behavior.
 
 ## Installation
 
-TBC
+The SDK is not yet published to Maven Central. Install it from source, pinned to a release tag
+(for example `1.0.0`). See the [installation guide](https://docs.dfns.co/sdks/frontend/kotlin) for
+details.
+
+**Gradle composite build.** Add the repository to your project (for example as a git submodule
+checked out at a release tag) and include it from `settings.gradle.kts`:
+
+```kotlin
+includeBuild("third-party/dfns-sdk-kotlin") {
+    dependencySubstitution {
+        substitute(module("co.dfns:androidsdk")).using(project(":androidsdk"))
+    }
+}
+```
+
+Then depend on it without a version:
+
+```kotlin
+dependencies {
+    implementation("co.dfns:androidsdk")
+}
+```
+
+**Prebuilt AAR.** Run `./gradlew :androidsdk:assembleRelease`, copy
+`androidsdk/build/outputs/aar/androidsdk-release.aar` into your app's `libs/` folder, and add the
+SDK's runtime dependencies yourself:
+
+```kotlin
+dependencies {
+    implementation(files("libs/androidsdk-release.aar"))
+    implementation("androidx.credentials:credentials:1.2.2")
+    implementation("com.google.code.gson:gson:2.11.0")
+}
+```
+
+On Android 13 and below, also add `androidx.credentials:credentials-play-services-auth` (see
+[Requirements](#requirements)).
 
 ## Concepts
 
