@@ -14,38 +14,66 @@ Welcome, builders 👋🔑 This repo holds Dfns Android SDK. Useful links:
 
 ## Installation
 
-The SDK is not yet published to Maven Central. Install it from source, pinned to a release tag
-(for example `1.0.0`). See the [installation guide](https://docs.dfns.co/sdks/frontend/kotlin) for
+Maven Central publishing is being finalized. Until it lands, build the SDK from source using one of
+the options below. See the [installation guide](https://docs.dfns.co/sdks/frontend/kotlin) for
 details.
 
-**Gradle composite build.** Add the repository to your project (for example as a git submodule
-checked out at a release tag) and include it from `settings.gradle.kts`:
+### Local Maven
+
+Clone the repository and publish it to your local Maven repository (`~/.m2`). The bundled Gradle
+wrapper downloads its own Gradle, so no local Gradle install is needed:
+
+```bash
+git clone https://github.com/dfns/dfns-sdk-kotlin.git
+cd dfns-sdk-kotlin
+./gradlew :androidsdk:publishToMavenLocal
+```
+
+This installs `co.dfns:androidsdk:1.0.0` into `~/.m2/repository`. Unlike Maven, Gradle does not
+search the local repository by default, so add `mavenLocal()` to your `settings.gradle.kts`:
 
 ```kotlin
-includeBuild("third-party/dfns-sdk-kotlin") {
-    dependencySubstitution {
-        substitute(module("co.dfns:androidsdk")).using(project(":androidsdk"))
+dependencyResolutionManagement {
+    repositories {
+        mavenLocal()
+        google()
+        mavenCentral()
     }
 }
 ```
 
-Then depend on it without a version:
+Then add the dependency:
+
+```kotlin
+dependencies {
+    implementation("co.dfns:androidsdk:1.0.0")
+}
+```
+
+Transitive dependencies (`androidx.credentials`, Gson) are declared in the published POM and resolved
+automatically. Re-run `./gradlew :androidsdk:publishToMavenLocal` after pulling a newer version of the
+SDK.
+
+### From the source code
+
+You can skip the publish step and build the SDK from a cloned copy as part of your own build, using a
+[composite build](https://docs.gradle.org/current/userguide/composite_builds.html). This needs no
+local Maven repository. It also works well in CI: add the SDK as a git submodule pinned to a release
+tag, and your build resolves it reproducibly with no registry.
+
+Clone the repository into your project (for example as a git submodule), then reference it from your
+`settings.gradle.kts`:
+
+```kotlin
+includeBuild("third-party/dfns-sdk-kotlin")
+```
+
+Depend on it without a version. Gradle builds the SDK from source and substitutes it for the
+dependency, resolving its transitive dependencies automatically:
 
 ```kotlin
 dependencies {
     implementation("co.dfns:androidsdk")
-}
-```
-
-**Prebuilt AAR.** Run `./gradlew :androidsdk:assembleRelease`, copy
-`androidsdk/build/outputs/aar/androidsdk-release.aar` into your app's `libs/` folder, and add the
-SDK's runtime dependencies yourself:
-
-```kotlin
-dependencies {
-    implementation(files("libs/androidsdk-release.aar"))
-    implementation("androidx.credentials:credentials:1.2.2")
-    implementation("com.google.code.gson:gson:2.11.0")
 }
 ```
 
