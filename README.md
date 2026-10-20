@@ -5,16 +5,80 @@ Welcome, builders 👋🔑 This repo holds Dfns Android SDK. Useful links:
 - [Dfns Website](https://www.dfns.co)
 - [Dfns API Docs](https://docs.dfns.co)
 
-## BETA Warning
+## Requirements
 
-:warning: **Attention: This project is currently in BETA.**
-
-This means that while we've worked hard to ensure its functionality there may still be bugs,
-performance issues, or unexpected behavior.
+- **Android 9 (API level 28) or higher.** The SDK is built with `minSdk = 28`, so consuming apps must declare `minSdk` 28 or above. This floor matches passkey support on Android, which is available from Android 9 onwards.
+- **Credential Manager provider.** Passkeys are created and asserted through [Credential Manager](https://developer.android.com/identity/sign-in/credential-manager) (`androidx.credentials`). On Android 13 and below, Credential Manager is backed by Google Play services: the device must have Google Play services, and your app must include the `androidx.credentials:credentials-play-services-auth` dependency alongside the SDK. On Android 14+, the framework supports third-party credential providers as well.
+- **Screen lock configured.** The device must have a screen lock (PIN, pattern, or biometric) set up; passkey creation fails without one.
+- **A credential provider account.** By default passkeys are saved to Google Password Manager, which requires a signed-in Google account (or, on Android 14+, another credential provider chosen by the user).
 
 ## Installation
 
-TBC
+Maven Central publishing is being finalized. Until it lands, build the SDK from source using one of
+the options below. See the [installation guide](https://docs.dfns.co/sdks/frontend/kotlin) for
+details.
+
+### Local Maven
+
+Clone the repository and publish it to your local Maven repository (`~/.m2`). The bundled Gradle
+wrapper downloads its own Gradle, so no local Gradle install is needed:
+
+```bash
+git clone https://github.com/dfns/dfns-sdk-kotlin.git
+cd dfns-sdk-kotlin
+./gradlew :androidsdk:publishToMavenLocal
+```
+
+This installs `co.dfns:androidsdk:1.0.0` into `~/.m2/repository`. Unlike Maven, Gradle does not
+search the local repository by default, so add `mavenLocal()` to your `settings.gradle.kts`:
+
+```kotlin
+dependencyResolutionManagement {
+    repositories {
+        mavenLocal()
+        google()
+        mavenCentral()
+    }
+}
+```
+
+Then add the dependency:
+
+```kotlin
+dependencies {
+    implementation("co.dfns:androidsdk:1.0.0")
+}
+```
+
+Transitive dependencies (`androidx.credentials`, Gson) are declared in the published POM and resolved
+automatically. Re-run `./gradlew :androidsdk:publishToMavenLocal` after pulling a newer version of the
+SDK.
+
+### From the source code
+
+You can skip the publish step and build the SDK from a cloned copy as part of your own build, using a
+[composite build](https://docs.gradle.org/current/userguide/composite_builds.html). This needs no
+local Maven repository. It also works well in CI: add the SDK as a git submodule pinned to a release
+tag, and your build resolves it reproducibly with no registry.
+
+Clone the repository into your project (for example as a git submodule), then reference it from your
+`settings.gradle.kts`:
+
+```kotlin
+includeBuild("third-party/dfns-sdk-kotlin")
+```
+
+Depend on it without a version. Gradle builds the SDK from source and substitutes it for the
+dependency, resolving its transitive dependencies automatically:
+
+```kotlin
+dependencies {
+    implementation("co.dfns:androidsdk")
+}
+```
+
+On Android 13 and below, also add `androidx.credentials:credentials-play-services-auth` (see
+[Requirements](#requirements)).
 
 ## Concepts
 
