@@ -1,7 +1,6 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.jetbrains.kotlin.android)
-    alias(libs.plugins.jetbrains.kotlin.compose)
 }
 
 android {
@@ -11,7 +10,7 @@ android {
         }
     }
     namespace = "co.dfns.sdk.tutorial.mobile"
-    compileSdk = 35
+    compileSdk = 34
 
     defaultConfig {
         applicationId = "co.dfns.sdk.tutorial.mobile"
@@ -44,6 +43,9 @@ android {
     }
     buildFeatures {
         compose = true
+    }
+    composeOptions {
+        kotlinCompilerExtensionVersion = "1.5.1"
     }
     packaging {
         resources {
