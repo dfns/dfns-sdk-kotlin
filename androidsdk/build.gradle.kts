@@ -9,7 +9,7 @@ version = "1.0.0"
 
 android {
     namespace = "co.dfns.androidsdk"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         minSdk = 28
