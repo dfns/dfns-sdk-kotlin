@@ -46,11 +46,24 @@ android {
     }
 }
 
+// AGP aligns the unit test compile classpath with the test runtime classpath, which carries the newer
+// androidx.credentials and its newer Kotlin stdlib. The test sources only need to compile, so skip
+// the metadata version check there. The SDK itself still compiles against the minimum version.
+tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach {
+    if (name.contains("UnitTest")) {
+        kotlinOptions.freeCompilerArgs += "-Xskip-metadata-version-check"
+    }
+}
+
 dependencies {
     implementation(libs.androidx.credentials)
     implementation(libs.gson)
 
     testImplementation(libs.junit)
+    // Run unit tests against the newest supported androidx.credentials (see PasskeyRequestCompatibilityTest).
+    testRuntimeOnly(libs.androidx.credentials.latest)
+    // Real org.json for unit tests: androidx.credentials parses request JSON with it, and the Android stub returns empty values.
+    testRuntimeOnly(libs.org.json)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
 }

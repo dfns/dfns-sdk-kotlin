@@ -49,16 +49,7 @@ class PasskeysSigner {
     ): Fido2Attestation {
         val response = credentialManager.createCredential(
             context,
-            CreatePublicKeyCredentialRequest(
-                gson.toJson(
-                    challenge.copy(
-                        user = challenge.user.copy(
-                            id = challenge.user.id.toByteArray().b64UrlEncode()
-                        ),
-                        rp = relyingParty
-                    )
-                )
-            ),
+            createPasskeyRequest(gson, challenge, relyingParty),
         )
 
         val responseData = gson.fromJson(
@@ -80,24 +71,10 @@ class PasskeysSigner {
     }
 
     suspend fun sign(challenge: UserActionChallenge): Fido2Assertion {
-        val option = GetPublicKeyCredentialOption(
-            gson.toJson(
-                GetPasskeyRequest(
-                    challenge = challenge.challenge,
-                    allowCredentials = challenge.allowCredentials.webauthn.map {
-                        GetPasskeyRequest.AllowCredentials(
-                            id = it.id,
-                            type = it.type,
-                        )
-                    },
-                    timeout = timeout,
-                    userVerification = challenge.userVerification,
-                    rpId = relyingParty.id,
-                )
-            )
+        val response = credentialManager.getCredential(
+            context,
+            getPasskeyRequest(gson, challenge, relyingParty, timeout),
         )
-        val getCredRequest = GetCredentialRequest(listOf(option))
-        val response = credentialManager.getCredential(context, getCredRequest)
         val cred = response.credential as PublicKeyCredential
 
         val passkeyResponse =
@@ -117,4 +94,62 @@ class PasskeysSigner {
 
         return fido2Assertion
     }
+}
+
+// The androidx.credentials constructors below are called with every argument spelled out, using the
+// library's own defaults. Omitting arguments makes Kotlin call a synthetic default-arguments
+// constructor whose signature changes whenever androidx adds a parameter, so an SDK built against
+// one androidx.credentials version would throw NoSuchMethodError in apps that resolve a newer one.
+// Full-argument constructors stay binary compatible across 1.x releases.
+
+internal fun createPasskeyRequest(
+    gson: Gson,
+    challenge: UserRegistrationChallenge,
+    relyingParty: RelyingParty,
+): CreatePublicKeyCredentialRequest = CreatePublicKeyCredentialRequest(
+    requestJson = gson.toJson(
+        challenge.copy(
+            user = challenge.user.copy(
+                id = challenge.user.id.toByteArray().b64UrlEncode()
+            ),
+            rp = relyingParty
+        )
+    ),
+    clientDataHash = null,
+    preferImmediatelyAvailableCredentials = false,
+    origin = null,
+    isAutoSelectAllowed = false,
+)
+
+internal fun getPasskeyRequest(
+    gson: Gson,
+    challenge: UserActionChallenge,
+    relyingParty: RelyingParty,
+    timeout: Long,
+): GetCredentialRequest {
+    val option = GetPublicKeyCredentialOption(
+        requestJson = gson.toJson(
+            GetPasskeyRequest(
+                challenge = challenge.challenge,
+                allowCredentials = challenge.allowCredentials.webauthn.map {
+                    GetPasskeyRequest.AllowCredentials(
+                        id = it.id,
+                        type = it.type,
+                    )
+                },
+                timeout = timeout,
+                userVerification = challenge.userVerification,
+                rpId = relyingParty.id,
+            )
+        ),
+        clientDataHash = null,
+        allowedProviders = emptySet(),
+    )
+    return GetCredentialRequest(
+        credentialOptions = listOf(option),
+        origin = null,
+        preferIdentityDocUi = false,
+        preferUiBrandingComponentName = null,
+        preferImmediatelyAvailableCredentials = false,
+    )
 }
