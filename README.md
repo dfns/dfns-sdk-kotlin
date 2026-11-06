@@ -30,7 +30,7 @@ cd dfns-sdk-kotlin
 ./gradlew :androidsdk:publishToMavenLocal
 ```
 
-This installs `co.dfns:androidsdk:1.0.0` into `~/.m2/repository`. Unlike Maven, Gradle does not
+This installs `co.dfns:androidsdk:1.0.1` into `~/.m2/repository`. Unlike Maven, Gradle does not
 search the local repository by default, so add `mavenLocal()` to your `settings.gradle.kts`:
 
 ```kotlin
@@ -47,7 +47,7 @@ Then add the dependency:
 
 ```kotlin
 dependencies {
-    implementation("co.dfns:androidsdk:1.0.0")
+    implementation("co.dfns:androidsdk:1.0.1")
 }
 ```
 
