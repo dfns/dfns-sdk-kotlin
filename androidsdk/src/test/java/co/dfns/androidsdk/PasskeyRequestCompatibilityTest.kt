@@ -1,5 +1,6 @@
 package co.dfns.androidsdk
 
+import androidx.credentials.GetPublicKeyCredentialOption
 import co.dfns.androidsdk.model.AllowCredentials
 import co.dfns.androidsdk.model.AuthenticatorSelectionCriteria
 import co.dfns.androidsdk.model.PublicKeyCredentialDescriptor
@@ -61,12 +62,15 @@ class PasskeyRequestCompatibilityTest {
             supportedCredentialKinds = emptyList(),
             allowCredentials = AllowCredentials(
                 webauthn = listOf(PublicKeyCredentialDescriptor(type = "public-key", id = "cred-1")),
-                key = emptyList(),
+                key = listOf(PublicKeyCredentialDescriptor(type = "public-key", id = "key-1")),
             ),
         )
 
         val request = getPasskeyRequest(gson, challenge, relyingParty, timeout = 60_000L)
+        val option = request.credentialOptions.single() as GetPublicKeyCredentialOption
 
         assertEquals(1, request.credentialOptions.size)
+        assertTrue(option.requestJson.contains("\"id\":\"cred-1\""))
+        assertTrue(option.requestJson.contains("\"id\":\"key-1\""))
     }
 }
