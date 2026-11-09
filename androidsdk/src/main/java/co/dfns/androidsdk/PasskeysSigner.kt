@@ -76,7 +76,12 @@ class PasskeysSigner {
             context,
             getPasskeyRequest(gson, challenge, relyingParty, timeout),
         )
-        val cred = response.credential as PublicKeyCredential
+        val cred = response.credential
+        if (cred !is PublicKeyCredential) {
+            throw IllegalStateException(
+                "Expected a public key credential, got ${cred.javaClass.simpleName}"
+            )
+        }
 
         val passkeyResponse =
             gson.fromJson(cred.authenticationResponseJson, GetPasskeyResponseData::class.java)
