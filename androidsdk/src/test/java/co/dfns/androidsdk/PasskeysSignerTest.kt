@@ -27,6 +27,18 @@ class PasskeysSignerTest {
     }
 
     @Test
+    fun `rejects a negative timeout`() {
+        val error = assertThrows(IllegalArgumentException::class.java) {
+            PasskeysSigner(
+                context = ContextWrapper(null),
+                relyingParty = relyingParty,
+                timeout = -1,
+            )
+        }
+        assertEquals("timeout must be positive", error.message)
+    }
+
+    @Test
     fun `rejects a registration response that is not a public key`() {
         val error = assertThrows(IllegalStateException::class.java) {
             requirePublicKeyRegistration(CreatePasswordResponse())
