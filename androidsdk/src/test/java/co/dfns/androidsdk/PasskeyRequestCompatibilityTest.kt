@@ -12,6 +12,7 @@ import co.dfns.androidsdk.model.UserInformation
 import co.dfns.androidsdk.model.UserRegistrationChallenge
 import com.google.gson.Gson
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
@@ -71,6 +72,6 @@ class PasskeyRequestCompatibilityTest {
 
         assertEquals(1, request.credentialOptions.size)
         assertTrue(option.requestJson.contains("\"id\":\"cred-1\""))
-        assertTrue(option.requestJson.contains("\"id\":\"key-1\""))
+        assertFalse(option.requestJson.contains("\"id\":\"key-1\""))
     }
 }

@@ -137,9 +137,7 @@ internal fun getPasskeyRequest(
         requestJson = gson.toJson(
             GetPasskeyRequest(
                 challenge = challenge.challenge,
-                allowCredentials = (
-                    challenge.allowCredentials.webauthn + challenge.allowCredentials.key
-                ).map {
+                allowCredentials = challenge.allowCredentials.webauthn.map {
                     GetPasskeyRequest.AllowCredentials(
                         id = it.id,
                         type = it.type,
