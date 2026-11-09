@@ -46,10 +46,11 @@ class PasskeyRequestCompatibilityTest {
             excludeCredentials = emptyList(),
         )
 
-        val request = createPasskeyRequest(gson, challenge, relyingParty)
+        val request = createPasskeyRequest(gson, challenge, relyingParty, timeout = 60_000L)
 
         assertTrue(request.requestJson.contains("\"challenge\":\"challenge-value\""))
         assertTrue(request.requestJson.contains("\"id\":\"example.com\""))
+        assertTrue(request.requestJson.contains("\"timeout\":60000"))
     }
 
     @Test

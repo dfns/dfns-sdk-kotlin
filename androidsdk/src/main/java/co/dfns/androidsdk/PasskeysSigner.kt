@@ -55,7 +55,7 @@ class PasskeysSigner {
         val response = try {
             credentialManager.createCredential(
                 context,
-                createPasskeyRequest(gson, challenge, relyingParty),
+                createPasskeyRequest(gson, challenge, relyingParty, timeout),
             )
         } catch (error: Exception) {
             mapPasskeyFailure(error)
@@ -148,20 +148,25 @@ internal fun createPasskeyRequest(
     gson: Gson,
     challenge: UserRegistrationChallenge,
     relyingParty: RelyingParty,
-): CreatePublicKeyCredentialRequest = CreatePublicKeyCredentialRequest(
-    requestJson = gson.toJson(
+    timeout: Long,
+): CreatePublicKeyCredentialRequest {
+    val requestJson = gson.toJsonTree(
         challenge.copy(
             user = challenge.user.copy(
                 id = challenge.user.id.toByteArray().b64UrlEncode()
             ),
             rp = relyingParty
         )
-    ),
-    clientDataHash = null,
-    preferImmediatelyAvailableCredentials = false,
-    origin = null,
-    isAutoSelectAllowed = false,
-)
+    ).asJsonObject
+    requestJson.addProperty("timeout", timeout)
+    return CreatePublicKeyCredentialRequest(
+        requestJson = gson.toJson(requestJson),
+        clientDataHash = null,
+        preferImmediatelyAvailableCredentials = false,
+        origin = null,
+        isAutoSelectAllowed = false,
+    )
+}
 
 internal fun getPasskeyRequest(
     gson: Gson,
