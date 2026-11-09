@@ -61,13 +61,17 @@ fun WalletsPage(
         CoroutineScope(Dispatchers.IO).launch {
             val resp = server.listWallets(token.value)
 
-            walletId.value = resp.items[0].id
             wallets.value = resp.items
+            walletId.value = resp.items.firstOrNull()?.id ?: ""
         }
     }
 
     fun sign() {
         CoroutineScope(Dispatchers.IO).launch {
+            if (walletId.value.isBlank()) {
+                signatureResponse.value = "No wallet is available to sign with."
+                return@launch
+            }
             val initResponse = server.initSignature(
                 message = message.value,
                 walletId = walletId.value,
