@@ -38,6 +38,7 @@ class PasskeysSigner {
         require(relyingParty.id.isNotBlank() && relyingParty.name.isNotBlank()) {
             "Relying party ID and name must be specified"
         }
+        require(timeout > 0) { "timeout must be positive" }
         this.context = context
         this.relyingParty = relyingParty
         this.timeout = timeout
