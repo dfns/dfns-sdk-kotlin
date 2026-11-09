@@ -1,8 +1,10 @@
 package co.dfns.androidsdk
 
 import android.content.Context
+import androidx.credentials.CreateCredentialResponse
 import androidx.credentials.CreatePublicKeyCredentialRequest
 import androidx.credentials.CreatePublicKeyCredentialResponse
+import androidx.credentials.Credential
 import androidx.credentials.CredentialManager
 import androidx.credentials.GetCredentialRequest
 import androidx.credentials.GetPublicKeyCredentialOption
@@ -54,7 +56,7 @@ class PasskeysSigner {
         )
 
         val responseData = gson.fromJson(
-            (response as CreatePublicKeyCredentialResponse).registrationResponseJson,
+            requirePublicKeyRegistration(response).registrationResponseJson,
             CreatePasskeyResponseData::class.java
         )
 
@@ -76,12 +78,7 @@ class PasskeysSigner {
             context,
             getPasskeyRequest(gson, challenge, relyingParty, timeout),
         )
-        val cred = response.credential
-        if (cred !is PublicKeyCredential) {
-            throw IllegalStateException(
-                "Expected a public key credential, got ${cred.javaClass.simpleName}"
-            )
-        }
+        val cred = requirePublicKeyAssertion(response.credential)
 
         val passkeyResponse =
             gson.fromJson(cred.authenticationResponseJson, GetPasskeyResponseData::class.java)
@@ -107,6 +104,26 @@ class PasskeysSigner {
 // constructor whose signature changes whenever androidx adds a parameter, so an SDK built against
 // one androidx.credentials version would throw NoSuchMethodError in apps that resolve a newer one.
 // Full-argument constructors stay binary compatible across 1.x releases.
+
+internal fun requirePublicKeyRegistration(
+    response: CreateCredentialResponse,
+): CreatePublicKeyCredentialResponse {
+    if (response !is CreatePublicKeyCredentialResponse) {
+        throw IllegalStateException(
+            "Expected a public key credential response, got ${response.javaClass.simpleName}"
+        )
+    }
+    return response
+}
+
+internal fun requirePublicKeyAssertion(credential: Credential): PublicKeyCredential {
+    if (credential !is PublicKeyCredential) {
+        throw IllegalStateException(
+            "Expected a public key credential, got ${credential.javaClass.simpleName}"
+        )
+    }
+    return credential
+}
 
 internal fun createPasskeyRequest(
     gson: Gson,
