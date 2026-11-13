@@ -57,6 +57,12 @@ data class AllowCredentials(
     val webauthn: List<PublicKeyCredentialDescriptor>, val key: List<PublicKeyCredentialDescriptor>
 )
 
+data class SupportedCredentialKind(
+    val kind: String,
+    val factor: String,
+    val requiresSecondFactor: Boolean,
+)
+
 data class UserActionChallenge(
     val attestation: String,
     val userVerification: String,
@@ -64,7 +70,7 @@ data class UserActionChallenge(
     val challenge: String,
     val challengeIdentifier: String,
     val rp: RelyingParty? = null,
-    val supportedCredentialKinds: List<SupportedCredentialKinds>,
+    val supportedCredentialKinds: List<SupportedCredentialKind>,
     val allowCredentials: AllowCredentials
 )
 
