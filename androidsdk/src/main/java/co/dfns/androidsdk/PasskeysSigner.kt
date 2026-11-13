@@ -1,12 +1,16 @@
 package co.dfns.androidsdk
 
 import android.content.Context
+import androidx.credentials.CreateCredentialResponse
 import androidx.credentials.CreatePublicKeyCredentialRequest
 import androidx.credentials.CreatePublicKeyCredentialResponse
+import androidx.credentials.Credential
 import androidx.credentials.CredentialManager
 import androidx.credentials.GetCredentialRequest
 import androidx.credentials.GetPublicKeyCredentialOption
 import androidx.credentials.PublicKeyCredential
+import androidx.credentials.exceptions.CreateCredentialCancellationException
+import androidx.credentials.exceptions.GetCredentialCancellationException
 import co.dfns.androidsdk.model.CreatePasskeyResponseData
 import co.dfns.androidsdk.model.Fido2Assertion
 import co.dfns.androidsdk.model.Fido2AssertionData
@@ -38,6 +42,7 @@ class PasskeysSigner {
         require(relyingParty.id.isNotBlank() && relyingParty.name.isNotBlank()) {
             "Relying party ID and name must be specified"
         }
+        require(timeout > 0) { "timeout must be positive" }
         this.context = context
         this.relyingParty = relyingParty
         this.timeout = timeout
@@ -47,13 +52,17 @@ class PasskeysSigner {
     suspend fun create(
         challenge: UserRegistrationChallenge
     ): Fido2Attestation {
-        val response = credentialManager.createCredential(
-            context,
-            createPasskeyRequest(gson, challenge, relyingParty),
-        )
+        val response = try {
+            credentialManager.createCredential(
+                context,
+                createPasskeyRequest(gson, challenge, relyingParty, timeout),
+            )
+        } catch (error: Exception) {
+            mapPasskeyFailure(error)
+        }
 
         val responseData = gson.fromJson(
-            (response as CreatePublicKeyCredentialResponse).registrationResponseJson,
+            requirePublicKeyRegistration(response).registrationResponseJson,
             CreatePasskeyResponseData::class.java
         )
 
@@ -71,11 +80,15 @@ class PasskeysSigner {
     }
 
     suspend fun sign(challenge: UserActionChallenge): Fido2Assertion {
-        val response = credentialManager.getCredential(
-            context,
-            getPasskeyRequest(gson, challenge, relyingParty, timeout),
-        )
-        val cred = response.credential as PublicKeyCredential
+        val response = try {
+            credentialManager.getCredential(
+                context,
+                getPasskeyRequest(gson, challenge, relyingParty, timeout),
+            )
+        } catch (error: Exception) {
+            mapPasskeyFailure(error)
+        }
+        val cred = requirePublicKeyAssertion(response.credential)
 
         val passkeyResponse =
             gson.fromJson(cred.authenticationResponseJson, GetPasskeyResponseData::class.java)
@@ -102,24 +115,58 @@ class PasskeysSigner {
 // one androidx.credentials version would throw NoSuchMethodError in apps that resolve a newer one.
 // Full-argument constructors stay binary compatible across 1.x releases.
 
+internal fun mapPasskeyFailure(error: Exception): Nothing {
+    if (error is CreateCredentialCancellationException ||
+        error is GetCredentialCancellationException
+    ) {
+        throw PasskeyCancellationException(error)
+    }
+    throw error
+}
+
+internal fun requirePublicKeyRegistration(
+    response: CreateCredentialResponse,
+): CreatePublicKeyCredentialResponse {
+    if (response !is CreatePublicKeyCredentialResponse) {
+        throw IllegalStateException(
+            "Expected a public key credential response, got ${response.javaClass.simpleName}"
+        )
+    }
+    return response
+}
+
+internal fun requirePublicKeyAssertion(credential: Credential): PublicKeyCredential {
+    if (credential !is PublicKeyCredential) {
+        throw IllegalStateException(
+            "Expected a public key credential, got ${credential.javaClass.simpleName}"
+        )
+    }
+    return credential
+}
+
 internal fun createPasskeyRequest(
     gson: Gson,
     challenge: UserRegistrationChallenge,
     relyingParty: RelyingParty,
-): CreatePublicKeyCredentialRequest = CreatePublicKeyCredentialRequest(
-    requestJson = gson.toJson(
+    timeout: Long,
+): CreatePublicKeyCredentialRequest {
+    val requestJson = gson.toJsonTree(
         challenge.copy(
             user = challenge.user.copy(
                 id = challenge.user.id.toByteArray().b64UrlEncode()
             ),
             rp = relyingParty
         )
-    ),
-    clientDataHash = null,
-    preferImmediatelyAvailableCredentials = false,
-    origin = null,
-    isAutoSelectAllowed = false,
-)
+    ).asJsonObject
+    requestJson.addProperty("timeout", timeout)
+    return CreatePublicKeyCredentialRequest(
+        requestJson = gson.toJson(requestJson),
+        clientDataHash = null,
+        preferImmediatelyAvailableCredentials = false,
+        origin = null,
+        isAutoSelectAllowed = false,
+    )
+}
 
 internal fun getPasskeyRequest(
     gson: Gson,

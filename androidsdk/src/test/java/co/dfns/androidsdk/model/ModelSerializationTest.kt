@@ -144,6 +144,30 @@ class ModelSerializationTest {
     }
 
     @Test
+    fun `UserActionChallenge reads credential kinds from the API list`() {
+        val json = """
+            {
+              "attestation": "none",
+              "userVerification": "required",
+              "externalAuthenticationUrl": "",
+              "challenge": "challenge-value",
+              "challengeIdentifier": "chal-123",
+              "supportedCredentialKinds": [
+                { "kind": "Fido2", "factor": "first", "requiresSecondFactor": false }
+              ],
+              "allowCredentials": { "webauthn": [], "key": [] }
+            }
+        """.trimIndent()
+
+        val parsed = gson.fromJson(json, UserActionChallenge::class.java)
+        val kind = parsed.supportedCredentialKinds.single()
+
+        assertEquals("Fido2", kind.kind)
+        assertEquals("first", kind.factor)
+        assertEquals(false, kind.requiresSecondFactor)
+    }
+
+    @Test
     fun `UserActionAssertion round-trips through Fido2 assertion`() {
         val assertion = UserActionAssertion(
             challengeIdentifier = "challenge-id",
