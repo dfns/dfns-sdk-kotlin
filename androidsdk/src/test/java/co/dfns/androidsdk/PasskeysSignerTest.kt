@@ -3,11 +3,8 @@ package co.dfns.androidsdk
 import android.content.ContextWrapper
 import androidx.credentials.CreatePasswordResponse
 import androidx.credentials.PasswordCredential
-import androidx.credentials.exceptions.CreateCredentialCancellationException
-import androidx.credentials.exceptions.GetCredentialCancellationException
 import co.dfns.androidsdk.model.RelyingParty
 import org.junit.Assert.assertEquals
-import org.junit.Assert.assertSame
 import org.junit.Assert.assertThrows
 import org.junit.Test
 
@@ -58,34 +55,5 @@ class PasskeysSignerTest {
             "Expected a public key credential, got PasswordCredential",
             error.message,
         )
-    }
-
-    @Test
-    fun `maps a dismissed registration prompt`() {
-        val cause = CreateCredentialCancellationException("dismissed")
-        val error = assertThrows(PasskeyCancellationException::class.java) {
-            mapPasskeyFailure(cause)
-        }
-        assertSame(cause, error.cause)
-        assertEquals("dismissed", error.message)
-    }
-
-    @Test
-    fun `maps a dismissed assertion prompt`() {
-        val cause = GetCredentialCancellationException("dismissed")
-        val error = assertThrows(PasskeyCancellationException::class.java) {
-            mapPasskeyFailure(cause)
-        }
-        assertSame(cause, error.cause)
-        assertEquals("dismissed", error.message)
-    }
-
-    @Test
-    fun `leaves other credential failures unchanged`() {
-        val cause = IllegalStateException("provider missing")
-        val error = assertThrows(IllegalStateException::class.java) {
-            mapPasskeyFailure(cause)
-        }
-        assertSame(cause, error)
     }
 }

@@ -9,8 +9,6 @@ import androidx.credentials.CredentialManager
 import androidx.credentials.GetCredentialRequest
 import androidx.credentials.GetPublicKeyCredentialOption
 import androidx.credentials.PublicKeyCredential
-import androidx.credentials.exceptions.CreateCredentialCancellationException
-import androidx.credentials.exceptions.GetCredentialCancellationException
 import co.dfns.androidsdk.model.CreatePasskeyResponseData
 import co.dfns.androidsdk.model.Fido2Assertion
 import co.dfns.androidsdk.model.Fido2AssertionData
@@ -52,14 +50,10 @@ class PasskeysSigner {
     suspend fun create(
         challenge: UserRegistrationChallenge
     ): Fido2Attestation {
-        val response = try {
-            credentialManager.createCredential(
-                context,
-                createPasskeyRequest(gson, challenge, relyingParty, timeout),
-            )
-        } catch (error: Exception) {
-            mapPasskeyFailure(error)
-        }
+        val response = credentialManager.createCredential(
+            context,
+            createPasskeyRequest(gson, challenge, relyingParty, timeout),
+        )
 
         val responseData = gson.fromJson(
             requirePublicKeyRegistration(response).registrationResponseJson,
@@ -80,14 +74,10 @@ class PasskeysSigner {
     }
 
     suspend fun sign(challenge: UserActionChallenge): Fido2Assertion {
-        val response = try {
-            credentialManager.getCredential(
-                context,
-                getPasskeyRequest(gson, challenge, relyingParty, timeout),
-            )
-        } catch (error: Exception) {
-            mapPasskeyFailure(error)
-        }
+        val response = credentialManager.getCredential(
+            context,
+            getPasskeyRequest(gson, challenge, relyingParty, timeout),
+        )
         val cred = requirePublicKeyAssertion(response.credential)
 
         val passkeyResponse =
@@ -114,15 +104,6 @@ class PasskeysSigner {
 // constructor whose signature changes whenever androidx adds a parameter, so an SDK built against
 // one androidx.credentials version would throw NoSuchMethodError in apps that resolve a newer one.
 // Full-argument constructors stay binary compatible across 1.x releases.
-
-internal fun mapPasskeyFailure(error: Exception): Nothing {
-    if (error is CreateCredentialCancellationException ||
-        error is GetCredentialCancellationException
-    ) {
-        throw PasskeyCancellationException(error)
-    }
-    throw error
-}
 
 internal fun requirePublicKeyRegistration(
     response: CreateCredentialResponse,
